@@ -1,6 +1,5 @@
-from __future__ import absolute_import
 import sys
-sys.path.append("/root/gec_noise_generator_ko")
+sys.path.append("./")
 from wisekmapy.wisekma import Wisekma
 from mecab import MeCab
 import hangul_jamo
