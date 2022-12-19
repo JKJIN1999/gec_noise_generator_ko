@@ -173,7 +173,9 @@ def noise(data_directory, error_list, result_directory, json_maximum, tokenizer_
     if result:
         file_name = result_directory + id + "_" + str(file_num) + ".json"
         __dump_file(result, file_name)
-        logger.info(" 문장 {} ~ {} 까지 오류가 생성되었고 json 리스트를 새로운 파일에 저장했습니다.".format(last_line, len(sentences)-1))
+        message = (" 문장 {} ~ {} 까지 오류가 생성되었고 json 리스트를 새로운 파일에 저장했습니다.\n 완료까지 {} 줄 남았습니다".format(last_line, len(sentences)-1, (total_sentences - sentence_num + 1)))
+        logger.info(message)
+        print(message)
         
     end_time = time.time()
     total_time = end_time - start_time
