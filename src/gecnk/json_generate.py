@@ -51,6 +51,7 @@ def noise(data_directory, error_list, result_directory, json_maximum, tokenizer_
         logger.info(" 데이터 파일에서 문장을 추출완료... 노이즈 생성을 시작합니다")
         logger.info(" 오류 종류 : [ " + ", ".join(error_list) + " ]")
     except FileNotFoundError as fe:
+        print(fe)
         logger.error(fe)
         return
 
