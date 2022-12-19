@@ -84,7 +84,8 @@ def noise(data_directory, error_list, result_directory, json_maximum, tokenizer_
             return
     start_time = time.time()
     avg_time = start_time
-    for sentence_num in range(0, len(sentences)):
+    total_sentences = len(sentences)
+    for sentence_num in range(0, total_sentences):
         sentence = sentences[sentence_num].replace("\n", "").strip()
         words = tokenize_words(sentence.split(), tokenizer_type)
         sentence_dic = {}

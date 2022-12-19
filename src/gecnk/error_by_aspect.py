@@ -281,7 +281,7 @@ class ErrorByAspect:
                     token[0] = word_g2p[start:start + token_len]
                     start += token_len
                 return word
-        return word
+            return word
 
         functions = [affix_error, convert_final_consonant, overlapping_sound_error, phonetic_first_error,
                      typical_final_consonant, add_final_consonant, busa_error, diphthong_vowel_error, singular_vowel_error, g2p_error]
