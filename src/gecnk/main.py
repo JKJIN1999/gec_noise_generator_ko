@@ -3,6 +3,9 @@ import argparse
 import json
 import os
 import sys
+import shutil
+import zipfile
+import pandas as pd
 from json_generate import noise
 
 sys.path.append("./")
@@ -10,18 +13,21 @@ current_file = os.path.dirname(__file__)
 sys.path.append("./src/")
 sys.path.append("./src/gecnk/")
 result_file = "./src"
-# result_file = "/".join(current_file.split("/")[:-1])
-""" print(current_file)
-sys.path.append(current_file)
-logs_file = "/".join(current_file.split("/")[:-2], "logs/")
-result_file = "/".join(current_file.split("/")[:-1], "results/")
-sys.path.append(result_file) """
 
 
 def main(data_directory, error_list, result_directory, json_maximum, tokenizer_type, label_type, error_by):
     noise(data_directory, error_list,
                    result_directory, json_maximum, tokenizer_type ,label_type, error_by)
-
+    for x in error_list:
+        error_name += "_" + x 
+    zip_name = (data_directory.split("/")[-1] + error_name)
+    path_to_json = result_file + "/results/"
+    json_files = [pos_json for pos_json in os.listdir(path_to_json) if pos_json.endswith('.json')]
+    ZipFile = zipfile.ZipFile(path_to_json + zip_name+".zip", "a")
+    for j_file in json_files:
+        ZipFile.write(j_file)
+        os.remove(path_to_json + j_file)
+    ZipFile.close()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
