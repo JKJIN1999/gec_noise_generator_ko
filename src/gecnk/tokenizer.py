@@ -2,9 +2,9 @@ from constant import *
 from log_manage import __get_logger
 import hangul_jamo
 from mecab import MeCab
-from wisekmapy.wisekma import Wisekma
 import sys
 sys.path.append("./")
+from wisekmapy.wisekma import Wisekma
 logger = __get_logger()
 
 
