@@ -5,29 +5,30 @@ import random
 import os
 from g2pk import G2p
 g2p = G2p()
-      
+
 
 class ErrorByCategory:
-    
+
     def josa_error(words):
-        
+
         def remove_josa(word):
             for token in word[0]:
                 if token[1][0] == "J" and len(word[0]) > 1:
                     token[0] = ""
                     word[1][0] = "OM"
                     return word
-            return word        
-        
+            return word
+
         def convert_josa(word):
             for token in word[0]:
                 if token[1][0] == "J":
                     for josa_list in JOSA_CONVERT_LIST:
                         if token[0] in josa_list:
-                            new_josa = random.choice([x for x in josa_list if x != token[0]])
+                            new_josa = random.choice(
+                                [x for x in josa_list if x != token[0]])
                             if len(token[0]) == len(new_josa):
                                 check_josa = [token[0], new_josa]
-                                if set(check_josa).issubset(["에","께","의"]) or set(check_josa).issubset(["이","가"]) or set(check_josa).issubset(["처럼","마냥"]):
+                                if set(check_josa).issubset(["에", "께", "의"]) or set(check_josa).issubset(["이", "가"]) or set(check_josa).issubset(["처럼", "마냥"]):
                                     word[1][0] = "REP"
                                 else:
                                     word[1][0] = "MIF"
@@ -38,15 +39,15 @@ class ErrorByCategory:
                             token[0] = new_josa
                             return word
             return word
-        
+
         functions = [remove_josa, convert_josa]
         for word in words:
-            func = random.choice(functions) 
+            func = random.choice(functions)
             if word[1][0] == "type":
                 word = func(word)
         return words
-    
-    def affix_error(words):       
+
+    def affix_error(words):
         # 토큰의 행태소 품사가 "X"로 시작하면 율>률 또는 양>량 식으로 바꿔준다
         for word in words:
             if word[1][0] == "type":
@@ -57,17 +58,17 @@ class ErrorByCategory:
                             characters[-1] = "율" if characters[-1] == "률" else "률"
                             word[1][0] = "MIF"
                         elif characters[-1] in ["양", "량"]:
-                            characters[-1] = "양" if characters[-1] == "량" else "량"   
+                            characters[-1] = "양" if characters[-1] == "량" else "량"
                             word[1][0] = "MIF"
-                        token[0] = ''.join(characters) 
+                        token[0] = ''.join(characters)
         return words
-           
+
     def busa_error(words):
-        busa_one = ["이" ,"히"]
+        busa_one = ["이", "히"]
         busa_two = ["마져", "마저"]
         for word in words:
             if word[1][0] == "type":
-                for token in word[0]:   
+                for token in word[0]:
                     if token[1][0] == "M":
                         if token[0] in busa_two:
                             token[0] = "마져" if token[0] == "마저" else "마저"
@@ -78,8 +79,8 @@ class ErrorByCategory:
                                 characters[-1] = "이" if characters[-1] == "히" else "히"
                                 token[0] = ''.join(characters)
                                 word[1][0] = "MIF"
-        return words             
-    
+        return words
+
     def spacing_add_error(words):
         for word in words:
             if word[1][0] == "type":
@@ -89,7 +90,8 @@ class ErrorByCategory:
                     # 가장 흔한 오류인 조사 또는 접사를 띄어써서 생기는 오류
                     if token_tag[0] == "J" or token_tag == [a for a in SPACING_ADD_DIC] or prev_token_tag == "XPN":
                         word[1][0] = "S_ADD"
-                        word[0][token_num][0] = " " + str(word[0][token_num][0])
+                        word[0][token_num][0] = " " + \
+                            str(word[0][token_num][0])
         return words
 
     def spacing_del_error(words):
@@ -97,8 +99,10 @@ class ErrorByCategory:
         remove_list = []
         for words_count in range(0, len(words)-1):
             if words[words_count][1][0] == "type" and not ignore_next:
-                front_word_tag = words[words_count][0][-1][1] # front word last token tag
-                back_word_tag = words[words_count + 1][0][0][1] # back word first token tag
+                # front word last token tag
+                front_word_tag = words[words_count][0][-1][1]
+                # back word first token tag
+                back_word_tag = words[words_count + 1][0][0][1]
                 for key, value in SPACING_DEL_DIC.items():
                     if front_word_tag == key and back_word_tag in value:
                         text = ""
@@ -112,13 +116,14 @@ class ErrorByCategory:
         for i in remove_list:
             words.remove(i)
         return words
-    
+
     def grapheme_to_phonem_error(words):
-        error_list = random.sample(list(range(0,len(words)-1)),4) if len(words) > 4 else list(range(0,len(words)-1))
+        error_list = random.sample(list(
+            range(0, len(words)-1)), 4) if len(words) > 4 else list(range(0, len(words)-1))
         for word_count in error_list:
             if words[word_count][1][0] == "type":
                 text = converge_word(words[word_count], "source")
-                isHangul = True 
+                isHangul = True
                 for character in text:
                     if not hangul_jamo.is_syllable(character):
                         isHangul = False
@@ -130,11 +135,11 @@ class ErrorByCategory:
                     for token in words[word_count][0]:
                         token_len = len(token[0])
                         token[0] = word_g2p[start:start + token_len]
-                        start += token_len     
+                        start += token_len
         return words
-    
+
     def consonant_error(words):
-        
+
         def phonetic_first_error(word):
             correct_phonetic, error_phonetic = phonetic_data()
             for token in word[0]:
@@ -147,14 +152,15 @@ class ErrorByCategory:
                         word[1][0] = "MIF"
                         return word
             return word
-        
+
         def middle_shiot_error(word):
             for token in word[0]:
                 result = []
                 if len(list(token[0])) >= 2 and token[1][0] == "N":
                     for character in token[0]:
                         if hangul_jamo.is_syllable(character):
-                            jamos = list(hangul_jamo.decompose_syllable(character))
+                            jamos = list(
+                                hangul_jamo.decompose_syllable(character))
                             if jamos[2] == "ㅅ":
                                 jamos[2] = None
                                 character = hangul_jamo.compose_jamo_characters(
@@ -165,7 +171,7 @@ class ErrorByCategory:
                     token[0] = "".join(result)
                     return word
             return word
-        
+
         def overlapping_sound_error(word):
             for token in word[0]:
                 characters = list(token[0])
@@ -185,7 +191,7 @@ class ErrorByCategory:
                                     word[1][0] = "MIF"
                                     return word
             return word
-        
+
         def convert_final_consonant(word):
             for token in word[0]:
                 result = []
@@ -195,38 +201,39 @@ class ErrorByCategory:
                         jamos = list(hangul_jamo.decompose_syllable(character))
                         if jamos[2]:
                             for key, value in FINAL_CONSONANT_CONVERT_DIC.items():
-                                jamos = list(hangul_jamo.decompose_syllable(character))
+                                jamos = list(
+                                    hangul_jamo.decompose_syllable(character))
                                 if jamos[2] == key:
                                     character = (hangul_jamo.
-                                                    compose_jamo_characters(jamos[0], jamos[1], random.choice(value)))
+                                                 compose_jamo_characters(jamos[0], jamos[1], random.choice(value)))
                                     word[1][0] = "MIF"
                                 elif jamos[2] in value and len(value) > 1:
                                     character = (hangul_jamo.
-                                                    compose_jamo_characters(jamos[0], jamos[1], random.choice([x for x in value if x != jamos[2]])))  
+                                                 compose_jamo_characters(jamos[0], jamos[1], random.choice([x for x in value if x != jamos[2]])))
                                     word[1][0] = "MIF"
-                    result.append(character)               
+                    result.append(character)
                 if word[1][0] == "MIF":
                     token[0] = "".join(result)
                     return word
             return word
-        
+
         def typical_final_consonant(word):
             for token in word[0]:
                 result = []
                 characters = list(token[0])
                 for character in characters:
-                    if character in ["않" , "안"]:
-                        character =  "않" if character == "안" else "안"
+                    if character in ["않", "안"]:
+                        character = "않" if character == "안" else "안"
                         word[1][0] = "MIF"
                     elif character in ["많", "만"]:
-                        character =  "많" if character == "만" else "만"
+                        character = "많" if character == "만" else "만"
                         word[1][0] = "MIF"
                     result.append(character)
                 if word[1][0] == "MIF":
                     token[0] = "".join(result)
                     return word
             return word
-                            
+
         def delete_final_consonant(word):
             for token in word[0]:
                 result = []
@@ -235,21 +242,22 @@ class ErrorByCategory:
                     if hangul_jamo.is_syllable(character):
                         jamos = list(hangul_jamo.decompose_syllable(character))
                         if jamos[2] == "ㅎ":
-                            jamos[2] = None 
-                            character = hangul_jamo.compose_jamo_characters(jamos[0], jamos[1], jamos[2])
+                            jamos[2] = None
+                            character = hangul_jamo.compose_jamo_characters(
+                                jamos[0], jamos[1], jamos[2])
                             word[1][0] = "OM"
                     result.append(character)
                 if word[1][0] == "OM":
                     token[0] = "".join(result)
                     return word
             return word
-        
+
         def add_final_consonant(word):
             previous_token = -1
             convert_previous = False
             for token in word[0]:
                 result = []
-                if token[1] == "EC" :
+                if token[1] == "EC":
                     if ''.join(list(token[0][:2])) == "으려":
                         result = ["을", "려"]
                         if len(token[0]) > 2:
@@ -258,15 +266,18 @@ class ErrorByCategory:
                         word[1][0] = "MIF"
                     elif previous_token > -1:
                         characters = list(token[0])
-                        previous_token_characters = list(word[0][previous_token][0])
-                        if characters[0] == "려" and not list(hangul_jamo.decompose_syllable(previous_token_characters[-1]))[2] :
-                            jamos = list(hangul_jamo.decompose_syllable(previous_token_characters[-1]))
+                        previous_token_characters = list(
+                            word[0][previous_token][0])
+                        if characters[0] == "려" and not list(hangul_jamo.decompose_syllable(previous_token_characters[-1]))[2]:
+                            jamos = list(hangul_jamo.decompose_syllable(
+                                previous_token_characters[-1]))
                             jamos[2] = "ㄹ"
-                            previous_token_characters[-1] = hangul_jamo.compose_jamo_characters(jamos[0], jamos[1], jamos[2])
+                            previous_token_characters[-1] = hangul_jamo.compose_jamo_characters(
+                                jamos[0], jamos[1], jamos[2])
                             word[1][0] = "MIF"
                             convert_previous = True
                             for x in previous_token_characters:
-                                result.append(x)   
+                                result.append(x)
                     if word[1][0] == "MIF":
                         if not convert_previous:
                             token[0] = "".join(result)
@@ -275,20 +286,20 @@ class ErrorByCategory:
                             word[0][previous_token][0] = "".join(result)
                             return word
                 previous_token += 1
-            return word    
-        #addition_error,
-        functions = [phonetic_first_error, middle_shiot_error,  overlapping_sound_error, convert_final_consonant, delete_final_consonant,typical_final_consonant, add_final_consonant]
-        
-        
+            return word
+        # addition_error,
+        functions = [phonetic_first_error, middle_shiot_error,  overlapping_sound_error,
+                     convert_final_consonant, delete_final_consonant, typical_final_consonant, add_final_consonant]
+
         for word in words:
             func = random.choice(functions)
             if word[1][0] == "type":
                 word = func(word)
-        
+
         return words
-    
+
     def vowel_error(words):
-        
+
         def singular_vowel_error(word):
             for token in word[0]:
                 result = []
@@ -298,22 +309,23 @@ class ErrorByCategory:
                         jamos = list(hangul_jamo.decompose_syllable(character))
                         if jamos[1] in ["ㅐ", "ㅔ"]:
                             jamos[1] = "ㅔ" if jamos[1] == "ㅐ" else "ㅐ"
-                            character = (hangul_jamo.compose_jamo_characters(jamos[0], jamos[1], jamos[2]))
+                            character = (hangul_jamo.compose_jamo_characters(
+                                jamos[0], jamos[1], jamos[2]))
                             word[1][0] = "MIF"
                     result.append(character)
                 if word[1][0] == "MIF":
                     token[0] = "".join(result)
                     return word
             return word
-        
+
         def diphthong_vowel_error(word):
             for token in word[0]:
                 result = []
                 characters = list(token[0])
                 for character in characters:
                     if character in ["의", "이"]:
-                            character = "의" if character == "이" else "이"
-                            word[1][0] = "REP"
+                        character = "의" if character == "이" else "이"
+                        word[1][0] = "REP"
                     elif hangul_jamo.is_syllable(character):
                         jamos = list(hangul_jamo.decompose_syllable(character))
                         if jamos[1] in ["ㅖ", "ㅔ"]:
@@ -322,20 +334,19 @@ class ErrorByCategory:
                         elif jamos[1] in ["ㅙ", "ㅚ"]:
                             jamos[1] = "ㅙ" if jamos[1] == "ㅚ"else "ㅚ"
                             word[1][0] = "MIF"
-                        character = (hangul_jamo.compose_jamo_characters(jamos[0], jamos[1], jamos[2]))
+                        character = (hangul_jamo.compose_jamo_characters(
+                            jamos[0], jamos[1], jamos[2]))
                     result.append(character)
                 if word[1][0] in ["MIF", "REP"]:
                     token[0] = "".join(result)
                     return word
             return word
-        
+
         functions = [singular_vowel_error, diphthong_vowel_error]
-        
+
         for word in words:
             func = random.choice(functions)
             if word[1][0] == "type":
                 word = func(word)
-        
+
         return words
-    
-   

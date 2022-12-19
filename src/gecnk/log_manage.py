@@ -1,6 +1,8 @@
 import logging
 import logging.handlers
 import datetime
+
+
 def __get_logger():
     """로거 인스턴스 반환
     """
@@ -17,9 +19,9 @@ def __get_logger():
     stream_handler.setFormatter(formatter)
     # 파일 핸들러
     #filehandler = logging.FileHandler(log_file, encoding='utf-8')
-    #filehandler.setFormatter(formatter)
+    # filehandler.setFormatter(formatter)
     # RotatingFileHandler
-    log_max_size = 10 * 1024 * 1024  ## 10MB
+    log_max_size = 10 * 1024 * 1024  # 10MB
     log_file_count = 20
     rotatingFileHandler = logging.handlers.RotatingFileHandler(
         filename=log_file,
@@ -28,10 +30,10 @@ def __get_logger():
     )
     rotatingFileHandler.setFormatter(formatter)
     __logger.addHandler(rotatingFileHandler)
-    
-    #__logger.addHandler(filehandler)
+
+    # __logger.addHandler(filehandler)
     # 로거 인스턴스에 핸들러 삽입
-    #__logger.addHandler(stream_handler)
+    # __logger.addHandler(stream_handler)
     # 로그 레벨 정의
     __logger.setLevel(logging.INFO)
 

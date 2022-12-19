@@ -1,18 +1,18 @@
+from constant import *
+from log_manage import __get_logger
+import hangul_jamo
+from mecab import MeCab
+from wisekmapy.wisekma import Wisekma
 import sys
 sys.path.append("./")
-from wisekmapy.wisekma import Wisekma
-from mecab import MeCab
-import hangul_jamo
-from log_manage import __get_logger
 logger = __get_logger()
-from constant import *
 
 
 """ 띄어쓰기 단위로 토크나이징 및 각 토큰에 시작과 끝을 부여
     token은 리스트로 네가지 정보다 담기는데 [단어, 형태소, 시작점, 끝점] """
- 
- 
-def tokenize_words(words,tokenizer_type):
+
+
+def tokenize_words(words, tokenizer_type):
     mec = MeCab()
     words_list = []
     count = 0
@@ -35,6 +35,7 @@ def tokenize_words(words,tokenizer_type):
         word_list.append(["type", 0, 0])
         words_list.append(word_list)
     return words_list
+
 
 def tagging(words):
     mec = MeCab()
