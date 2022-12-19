@@ -9,7 +9,7 @@ logger = __get_logger()
 
 
 """ 띄어쓰기 단위로 토크나이징 및 각 토큰에 시작과 끝을 부여
-    token은 리스트로 네가지 정보다 담기는데 [단어, 형태소, 시작점, 끝점] """
+    token은 리스트로 네가지 정보다 담기는데 [[어절변형,품사,어절원형], 오류양상, 시작점, 끝점] """
 
 
 def tokenize_words(words, tokenizer_type):
