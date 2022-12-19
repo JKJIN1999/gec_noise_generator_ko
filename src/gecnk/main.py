@@ -18,7 +18,7 @@ result_file = "./src"
 def main(data_directory, error_list, result_directory, json_maximum, tokenizer_type, label_type, error_by):
     noise(data_directory, error_list,
           result_directory, json_maximum, tokenizer_type, label_type, error_by)
-    
+    error_name = ""
     # 파일 압축
     for x in error_list:
         error_name += "_" + x
