@@ -115,20 +115,19 @@ class ErrorByAspect:
         def busa_error(word):
             busa_one = ["이" ,"히"]
             busa_two = ["마져", "마저"]
-            if word[1][0] == "type":
-                for token in word[0]:   
-                    if token[1][0] == "M":
-                        if token[0] in busa_two:
-                            token[0] = "마져" if token[0] == "마저" else "마저"
+            for token in word[0]:   
+                if token[1][0] == "M":
+                    if token[0] in busa_two:
+                        token[0] = "마져" if token[0] == "마저" else "마저"
+                        word[1][0] = "MIF"
+                        return word
+                    elif token[1] == "MAG":
+                        if token[0][-1] in busa_one:
+                            characters = list(token[0])
+                            characters[-1] = "이" if characters[-1] == "히" else "히"
+                            token[0] = ''.join(characters)
                             word[1][0] = "MIF"
                             return word
-                        elif token[1] == "MAG":
-                            if token[0][-1] in busa_one:
-                                characters = list(token[0])
-                                characters[-1] = "이" if characters[-1] == "히" else "히"
-                                token[0] = ''.join(characters)
-                                word[1][0] = "MIF"
-                                return word
             return word       
         
         def add_final_consonant(word):
@@ -240,40 +239,38 @@ class ErrorByAspect:
         
         def affix_error(word):       
             # 토큰의 행태소 품사가 "X"로 시작하면 율>률 또는 양>량 식으로 바꿔준다
-            if word[1][0] == "type":
-                for token in word[0]:
-                    if token[1][0] == "X":
-                        characters = list(token[0])
-                        if characters[-1] in ["율", "률"]:
-                            characters[-1] = "율" if characters[-1] == "률" else "률"
-                            word[1][0] = "MIF"
-                            token[0] = ''.join(characters)
-                            return word 
-                        elif characters[-1] in ["양", "량"]:
-                            characters[-1] = "양" if characters[-1] == "량" else "량"   
-                            word[1][0] = "MIF"
-                            token[0] = ''.join(characters)
-                            return word
+            for token in word[0]:
+                if token[1][0] == "X":
+                    characters = list(token[0])
+                    if characters[-1] in ["율", "률"]:
+                        characters[-1] = "율" if characters[-1] == "률" else "률"
+                        word[1][0] = "MIF"
+                        token[0] = ''.join(characters)
+                        return word 
+                    elif characters[-1] in ["양", "량"]:
+                        characters[-1] = "양" if characters[-1] == "량" else "량"   
+                        word[1][0] = "MIF"
+                        token[0] = ''.join(characters)
+                        return word
             return word
         
         def g2p_error(word):
-            if word[1][0] == "type":
-                text = converge_word(word, "source")
-                isHangul = True 
-                for character in text:
-                    if not hangul_jamo.is_syllable(character):
-                        isHangul = False
-                        break
-                word_g2p = g2p(text)
-                if word_g2p != text and len(word_g2p) == len(text) and isHangul:
-                    start = 0
-                    word[1][0] = "MIF"
-                    for token in word[0]:
-                        token_len = len(token[0])
-                        token[0] = word_g2p[start:start + token_len]
-                        start += token_len 
-                    return word    
-            return word
+            text = converge_word(word, "source")
+            isHangul = True 
+            for character in text:
+                if not hangul_jamo.is_syllable(character):
+                    isHangul = False
+                    break
+            word_g2p = g2p(text)
+            if word_g2p != text and len(word_g2p) == len(text) and isHangul:
+                start = 0
+                word[1][0] = "MIF"
+                for token in word[0]:
+                    token_len = len(token[0])
+                    token[0] = word_g2p[start:start + token_len]
+                    start += token_len 
+                return word    
+        return word
         
         functions = [affix_error, convert_final_consonant, overlapping_sound_error, phonetic_first_error, typical_final_consonant, add_final_consonant,busa_error,diphthong_vowel_error,singular_vowel_error, g2p_error]
         
@@ -283,25 +280,6 @@ class ErrorByAspect:
                 word = func(word)
         return words
     
-    def g2p_error(words):
-        error_list = random.sample(list(range(0,len(words)-1)),4) if len(words) > 4 else list(range(0,len(words)-1))
-        for word_count in error_list:
-            if words[word_count][1][0] == "type":
-                text = converge_word(words[word_count], "source")
-                isHangul = True 
-                for character in text:
-                    if not hangul_jamo.is_syllable(character):
-                        isHangul = False
-                        break
-                word_g2p = g2p(text)
-                if word_g2p != text and len(word_g2p) == len(text) and isHangul:
-                    start = 0
-                    words[word_count][1][0] = "MIF"
-                    for token in words[word_count][0]:
-                        token_len = len(token[0])
-                        token[0] = word_g2p[start:start + token_len]
-                        start += token_len     
-        return words
     
     def rep_error(words):
         
