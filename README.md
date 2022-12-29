@@ -4,14 +4,19 @@
 # 설명
 
 ### 이 모델은 한글 맞춤법 검사기의 학습 데이터 증강을 목적으로 한국인이 자주 틀리는 오류 리서치에 기반해 생성한 노이즈 생성기입니다.
+### 오류를 생성할 데이터는 올바른 맞춤법을 갖춘 한글 문장을 한 줄 단위로 나누어 저장한 txt 파일 형식이어야 됩니다. 
+예시 링크 https://drive.google.com/drive/folders/1eBqzHWf7fzjjOjDxApSO6rrV2hdBLSWQ?usp=sharing<br />
 ### 오류의 생성 방법에는 국립 국어원의 오류주석 양상을 기준으로 한 방법과 오류 유형을 기준으로 하는 두가지 방법이 있습니다.
 ### 형태소 분석기 Mecab을 활용하고 있습니다.
 품사 태그는 아래의 사이트를 방문해 확인하시길 바랍니다.<br />
 https://m.blog.naver.com/PostView.naver?isHttpsRedirect=true&blogId=aramjo&logNo=221404488280 <br />
 
 # 결과물
-
+https://drive.google.com/drive/folders/163qe9Hec8gkgAE0ZzJmy-ryYLUpqcj-Y?usp=sharing
+위의 링크확인
 ![Alt text](src/gecnk/resources/examples.PNG?raw=true "Title")
+
+
 
 # Requirements
 
@@ -38,6 +43,8 @@ git clone https://github.com/JKJIN1999/gec_noise_generator_ko.git
 ```bash
 pip install -r requirements.txt
 ```
+### Noise를 생성할 올바른 맞춤법을 갖춘 문장 데이터
+예시 데이터 https://drive.google.com/drive/folders/1eBqzHWf7fzjjOjDxApSO6rrV2hdBLSWQ?usp=sharing<br />
 ### Terminal에서 main.py 실행
 GEC noise generator ko 에는 7가지 인자를 받습니다.
 
