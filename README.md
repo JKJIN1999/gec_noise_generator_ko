@@ -39,7 +39,7 @@ GEC noise generator ko 에는 7가지 인자를 받습니다.
 터미널 또는 bash에서 아래 코드를 입력하여 설명을 읽을수 있습니다.
 for explanation of how to use
 ```consol
-python3 gec_noise_generator_ko/src/gecnk/main.py -h 
+python3 gec_noise_generator_ko/src/gecnk/main.py -e OM REP MIF -r ./src/results -d NWRW
 ```
 ## Arguments<br />
 * -h, help            
@@ -108,10 +108,6 @@ gec_noise_generator_ko 를 사용하기 위해서는 텍스트 파일과 그 경
 * S_DEL [spacing delete error]
 > 특정 기준에 따라 constant 파일에 있는 SPACING_DEL_DIC을 활용<br />
 > 앞의 형태소가 key이고 뒤의 형태소가 value안에 있는경우 두 어절을 붙여쓴다<br />
-
-* G2P [grapheme to phonem error]
-> Converts the first or last character if it exists in phonetic data list<br />
-> 여 > 녀 / 율 > 률<br />
 
 * ALL
 > 모든 오류유형을 결합하여 오류를 생성<br />
