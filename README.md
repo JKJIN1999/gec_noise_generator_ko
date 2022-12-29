@@ -20,10 +20,10 @@ https://m.blog.naver.com/PostView.naver?isHttpsRedirect=true&blogId=aramjo&logNo
 ```consol
 pip install wget
 pip install hangul_jamo
-pip install inko
 pip install g2pk
 pip install gensim
 pip install python-mecab-ko
+pip install fasttext
 ```
  현재 윈도우 os에서 python-mecab-ko가 실행되지 않는 오류가 있습니다.<br />
  리눅스나 구글 코랩 macos에서만 사용 가능합니다.<br />
