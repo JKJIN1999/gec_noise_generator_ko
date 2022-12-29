@@ -60,7 +60,7 @@ python3 gec_noise_generator_ko/src/gecnk/main.py -e OM REP MIF -r ./src/results 
 * -t tokenizer_type    
 > 원하는 토크나이저의 유형을 -t 뒤에 입력하십시오<br />
 > 기본 토크나이저는 mecab으로 설정되어있습니다<br />
-> black은 사용은 가능하나 mecab을 토대로 개발되었기 때문에 오류가 존재하기에 mecab을 권장드립니다. <br />
+> black은 wisekmapy를 보유하시고 gec_noise_generator_ko 파일 안에 위치한다면 사용이 가능하지만 mecab을 토대로 개발되었기 때문에 오류가 존재하기에 mecab을 권장드립니다. <br />
 * -b error_by      
 > 오류 생성 기준을 오류 양상으로 할것인지 오류 유형으로 할것인지 입력하시오<br />
 > aspect는 오류 양상을 기준으로 오류 생성 (JS, BS, AF, G2P, S_ADD, S_DEL, CO, VO)<br />
