@@ -35,17 +35,17 @@ pip install fasttext
 
 # 사용 방법
 ## 준비 자료
-### 프로그램을 클론
+### 1. 프로그램을 클론
 ```consol
 git clone https://github.com/JKJIN1999/gec_noise_generator_ko.git
 ```
-### Requirements 설치
+### 2. Requirements 설치
 ```bash
 pip install -r requirements.txt
 ```
-### Noise를 생성할 올바른 맞춤법을 갖춘 문장 데이터
+### 3. Noise를 생성할 올바른 맞춤법을 갖춘 문장 데이터
 예시 데이터 https://drive.google.com/drive/folders/1eBqzHWf7fzjjOjDxApSO6rrV2hdBLSWQ?usp=sharing<br />
-### Terminal에서 main.py 실행
+### 4. Terminal에서 main.py 실행
 GEC noise generator ko 에는 7가지 인자를 받습니다.
 
 터미널 또는 bash에서 아래 코드에 원하는 인자를 입력하여 사용할 수 있습니다.<br />
