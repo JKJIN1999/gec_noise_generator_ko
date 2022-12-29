@@ -36,8 +36,8 @@ git clone https://github.com/JKJIN1999/gec_noise_generator_ko.git
 
 GEC noise generator ko 에는 7가지 인자를 받습니다.
 
-터미널 또는 bash에서 아래 코드를 입력하여 설명을 읽을수 있습니다.
-for explanation of how to use
+터미널 또는 bash에서 아래 코드에 원하는 인자를 입력하여 사용할 수 있습니다.<br />
+python3 gec_noise_generator_ko/src/gecnk/main.py 뒤에 인자를 입력하시면 됩니다. 예시는 아래와 같이<br />
 ```consol
 python3 gec_noise_generator_ko/src/gecnk/main.py -e OM REP MIF -r ./src/results -d NWRW
 ```
