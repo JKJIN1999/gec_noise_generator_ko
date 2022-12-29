@@ -10,7 +10,14 @@
 
 ### 이 모델은 한글 맞춤법 검사기의 학습 데이터 증강을 목적으로 한국인이 자주 틀리는 오류 리서치에 기반해 생성한 노이즈 생성기입니다.
 ### 오류의 생성 방법에는 국립 국어원의 오류주석 양상을 기준으로 한 방법과 오류 유형을 기준으로 하는 두가지 방법이 있습니다.
+### 인풋 데이터는 https://drive.google.com/drive/folders/1eBqzHWf7fzjjOjDxApSO6rrV2hdBLSWQ?usp=sharing
+### 위의 링크에 있는 데이터처럼 맞춤법이 올바른 문장을 각 줄마다 나열시킨 txt 형태의 파일입니다.
 
+# 결과자료
+
+### https://drive.google.com/drive/folders/163qe9Hec8gkgAE0ZzJmy-ryYLUpqcj-Y?usp=sharing
+### gec_noise_generator_ko는 문장을 형태소 분석기를 이용해 의도적으로 오류를 생성한 뒤, 위치, 오류 유형, 오류 전과 후를 json 형태로 전달해주는 프로그램입니다. 
+![Alt text](src/gecnk/resources/example.PNG?raw=true "Title")
 
 # Requirements
 
