@@ -56,7 +56,7 @@ python3 gec_noise_generator_ko/src/gecnk/main.py
 ```consol
 python3 gec_noise_generator_ko/src/gecnk/main.py -e OM REP MIF -r ./src/results -d NWRW
 ```
-## Arguments<br />
+## Arguments 인자<br />
 * -h, help            
 > README.md 에 자세한 설명이 적혀져있습니다.<br />
 * -d data_directory     
