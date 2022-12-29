@@ -2,6 +2,7 @@
 
 ### 이 모델은 python_mecab_ko를 메인 토크나이저로 활용합니다.
 ### Black 또한 사용 가능하지만 추가적인 작업이 필요합니다.
+### Black을 사용하고 싶으신 경우 wisekmapy를 gec_noise_generator_ko 파일 안에 넣어주시면 사용이 가능합니다.
 ### 품사 태그는 아래의 사이트를 방문해 확인하시길 바랍니다.
 ### https://m.blog.naver.com/PostView.naver?isHttpsRedirect=true&blogId=aramjo&logNo=221404488280
 

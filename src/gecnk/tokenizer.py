@@ -4,8 +4,15 @@ import hangul_jamo
 from mecab import MeCab
 import sys
 sys.path.append("./")
-from wisekmapy.wisekma import Wisekma
 logger = __get_logger()
+try:
+    from wisekmapy.wisekma import Wisekma
+except:
+    print("Error while importing Wisekmapy. Please make sure your wisekmapy is loaded to ./ directory")
+    print("Tokenizing only available with Mecab")
+    logger.error("Error while calling black wisekmapy. Please ensure the wisekmapy is installed to ./ this directory")
+    logger.error("Running with mecab")
+
 
 
 """ 띄어쓰기 단위로 토크나이징 및 각 토큰에 시작과 끝을 부여
@@ -20,7 +27,10 @@ def tokenize_words(words, tokenizer_type):
     if tokenizer_type == "mecab":
         tok = MeCab()
     elif tokenizer_type == "black":
-        tok = Wisekma()
+        try:
+            tok = Wisekma()
+        except:
+            tok = MeCab()
     else:
         logger.error("Unknown tokenizer name : {}".format(tokenizer_type))
         raise SystemExit

@@ -8,21 +8,22 @@ g2p = G2p()
 
 
 class ErrorByAspect:
-
+    
+    
     def om_error(words):
-
+        
         def remove_josa(word):
             for token in word[0]:
-                if token[1][0] == "J" and len(word[0]) > 1:
+                if token[1][0] == "J" and len(token) > 1:
                     token[0] = ""
                     word[1][0] = "OM"
                     return word
             return word
-
+        
         def middle_shiot_error(word):
             for token in word[0]:
                 result = []
-                if len(list(token[0])) >= 2 and token[1][0] == "N":
+                if token[1][0] == "N":
                     for character in token[0]:
                         if hangul_jamo.is_syllable(character):
                             jamos = list(
@@ -37,7 +38,7 @@ class ErrorByAspect:
                     token[0] = "".join(result)
                     return word
             return word
-
+        
         def delete_final_consonant(word):
             for token in word[0]:
                 result = []
@@ -55,7 +56,7 @@ class ErrorByAspect:
                     token[0] = "".join(result)
                     return word
             return word
-
+        
         def convert_josa(word):
             for token in word[0]:
                 if token[1][0] == "J":
@@ -73,13 +74,14 @@ class ErrorByAspect:
                      delete_final_consonant, convert_josa]
 
         for word in words:
-            func = random.choice(functions)
             if word[1][0] == "type":
+                func = random.choice(functions)
                 word = func(word)
         return words
 
-    def mif_error(words):
 
+    def mif_error(words):
+        
         def singular_vowel_error(word):
             for token in word[0]:
                 result = []
@@ -97,7 +99,7 @@ class ErrorByAspect:
                     token[0] = "".join(result)
                     return word
             return word
-
+        
         def diphthong_vowel_error(word):
             for token in word[0]:
                 result = []
@@ -106,10 +108,10 @@ class ErrorByAspect:
                     if hangul_jamo.is_syllable(character):
                         jamos = list(hangul_jamo.decompose_syllable(character))
                         if jamos[1] in ["ㅖ", "ㅔ"]:
-                            jamos[1] = "ㅖ" if jamos[1] == "ㅔ"else "ㅔ"
+                            jamos[1] = "ㅖ" if jamos[1] == "ㅔ" else "ㅔ"
                             word[1][0] = "MIF"
                         elif jamos[1] in ["ㅙ", "ㅚ"]:
-                            jamos[1] = "ㅙ" if jamos[1] == "ㅚ"else "ㅚ"
+                            jamos[1] = "ㅙ" if jamos[1] == "ㅚ" else "ㅚ"
                             word[1][0] = "MIF"
                         character = (hangul_jamo.compose_jamo_characters(
                             jamos[0], jamos[1], jamos[2]))
@@ -118,7 +120,7 @@ class ErrorByAspect:
                     token[0] = "".join(result)
                     return word
             return word
-
+        
         def busa_error(word):
             busa_one = ["이", "히"]
             busa_two = ["마져", "마저"]
@@ -136,7 +138,7 @@ class ErrorByAspect:
                             word[1][0] = "MIF"
                             return word
             return word
-
+        
         def add_final_consonant(word):
             previous_token = -1
             convert_previous = False
@@ -172,7 +174,7 @@ class ErrorByAspect:
                             return word
                 previous_token += 1
             return word
-
+        
         def typical_final_consonant(word):
             for token in word[0]:
                 result = []
@@ -189,7 +191,7 @@ class ErrorByAspect:
                     token[0] = "".join(result)
                     return word
             return word
-
+        
         def phonetic_first_error(word):
             correct_phonetic, error_phonetic = phonetic_data()
             for token in word[0]:
@@ -202,7 +204,7 @@ class ErrorByAspect:
                         word[1][0] = "MIF"
                         return word
             return word
-
+        
         def overlapping_sound_error(word):
             for token in word[0]:
                 characters = list(token[0])
@@ -222,7 +224,7 @@ class ErrorByAspect:
                                     word[1][0] = "MIF"
                                     return word
             return word
-
+        
         def convert_final_consonant(word):
             for token in word[0]:
                 result = []
@@ -247,7 +249,7 @@ class ErrorByAspect:
                     token[0] = "".join(result)
                     return word
             return word
-
+        
         def affix_error(word):
             # 토큰의 행태소 품사가 "X"로 시작하면 율>률 또는 양>량 식으로 바꿔준다
             for token in word[0]:
@@ -264,7 +266,7 @@ class ErrorByAspect:
                         token[0] = ''.join(characters)
                         return word
             return word
-
+        
         def g2p_error(word):
             text = converge_word(word, "source")
             isHangul = True
@@ -287,11 +289,12 @@ class ErrorByAspect:
                      typical_final_consonant, add_final_consonant, busa_error, diphthong_vowel_error, singular_vowel_error, g2p_error]
 
         for word in words:
-            func = random.choice(functions)
             if word[1][0] == "type":
+                func = random.choice(functions)
                 word = func(word)
         return words
 
+   
     def rep_error(words):
 
         def convert_josa(word):
@@ -326,11 +329,12 @@ class ErrorByAspect:
         functions = [convert_josa, diphthong_vowel_error]
 
         for word in words:
-            func = random.choice(functions)
             if word[1][0] == "type":
+                func = random.choice(functions)
                 word = func(word)
         return words
 
+    
     def add_error(words):
         for word in words:
             if word[1][0] == "type":
@@ -348,19 +352,19 @@ class ErrorByAspect:
                             break
         return words
 
+    
     def s_add_error(words):
         for word in words:
             if word[1][0] == "type":
                 for token_num in range(1, len(word[0])-1):
                     token_tag = word[0][token_num][1]
                     prev_token_tag = word[0][token_num - 1][1]
-                    # 가장 흔한 오류인 조사 또는 접사를 띄어써서 생기는 오류
                     if token_tag[0] == "J" or token_tag == [a for a in SPACING_ADD_DIC] or prev_token_tag == "XPN":
                         word[1][0] = "S_ADD"
-                        word[0][token_num][0] = " " + \
-                            str(word[0][token_num][0])
+                        word[0][token_num][0] = "".join(" ", str(word[0][token_num][0]))
         return words
 
+    
     def s_del_error(words):
         ignore_next = False
         remove_list = []
@@ -372,8 +376,7 @@ class ErrorByAspect:
                 back_word_tag = words[words_count + 1][0][0][1]
                 for key, value in SPACING_DEL_DIC.items():
                     if front_word_tag == key and back_word_tag in value:
-                        text = ""
-                        words[words_count][0][-1][2] += " "
+                        words[words_count][0][-1][2] == "".join(words[words_count][0][-1][2], " ")
                         words[words_count][0].extend(words[words_count+1][0])
                         words[words_count][1][0] = "S_DEL"
                         remove_list.append(words[words_count + 1])

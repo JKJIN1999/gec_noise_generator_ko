@@ -6,6 +6,7 @@ from constant import *
 import random
 import hangul_jamo
 import time
+import datetime
 from error_by_category import ErrorByCategory
 from error_by_aspect import ErrorByAspect
 
@@ -40,6 +41,7 @@ def noise(data_directory, error_list, result_directory, json_maximum, tokenizer_
     last_line = 0
     result = []
     id = data_directory.split("/")[-1]
+    time_list = []
     print("=====GEC Noise Generator Ko=====")
 
     print(" 오류 : {} 을 생성합니다".format(str(error_list)))
@@ -49,7 +51,8 @@ def noise(data_directory, error_list, result_directory, json_maximum, tokenizer_
         sentences = open(data_directory, 'rt', encoding='UTF-8').readlines()
         print(" 데이터 파일에서 문장을 추출완료... 노이즈 생성을 시작합니다")
         logger.info(" 데이터 파일에서 문장을 추출완료... 노이즈 생성을 시작합니다")
-        logger.info(" 오류 종류 : [ " + ", ".join(error_list) + " ]")
+        errors = ", ".join(error_list)
+        logger.info(" 오류 종류 : [ " + errors + " ]")
     except FileNotFoundError as fe:
         print(fe)
         logger.error(fe)
@@ -60,8 +63,7 @@ def noise(data_directory, error_list, result_directory, json_maximum, tokenizer_
     elif error_by == "category":
         error_labels = CATEGORY_LABEL
     else:
-        message = ([" 잘못된 인자를 입력됬습니다 error_by : " + error_labels,
-                   " [aspect] 와 [category] 중 하나를 입력해주십시오"])
+        message = ([" 잘못된 인자를 입력됬습니다 error_by : " + error_labels + " [aspect] 와 [category] 중 하나를 입력해주십시오"])
         logger.error(message[0])
         logger.error(message[1])
         print_error([message])
@@ -76,20 +78,19 @@ def noise(data_directory, error_list, result_directory, json_maximum, tokenizer_
     for error in error_list:
         if error not in error_labels.keys():
             error_label_list = list(error_labels.keys())
-            message = ([" 잘못된 오류 유형을 입력했습니다 : " + error,
-                       " 이 리스트에 존재하는 오류 유형을 입력해주십시오 : " + str(error_label_list)])
+            message = ([" 잘못된 오류 유형을 입력했습니다 : " + error + " 이 리스트에 존재하는 오류 유형을 입력해주십시오 : " + str(error_label_list)])
             logger.error(message[0])
             logger.error(message[1])
             print_error([message])
             return
-    start_time = time.time()
-    avg_time = start_time
     total_sentences = len(sentences)
+    start_time = time.time()
     for sentence_num in range(0, total_sentences):
         sentence = sentences[sentence_num].replace("\n", "").strip()
         words = tokenize_words(sentence.split(), tokenizer_type)
         sentence_dic = {}
-        sentence_dic["id"] = id + "." + str(sentence_num)
+        file_id = [id, ".", str(sentence_num)]
+        sentence_dic["id"] = "".join(file_id)
         sentence_dic["source"] = []
         sentence_dic["target"] = sentence
         sentence_dic["word"] = []
@@ -167,33 +168,32 @@ def noise(data_directory, error_list, result_directory, json_maximum, tokenizer_
         logger.debug("Noised {}".format(sentence_num))
 
         if sentence_num > 0 and (sentence_num+1) % json_maximum == 0:
-
-            current_time = int((len(sentences)/sentence_num)
-                               * int(time.time()-start_time))
-            avg_time = current_time if avg_time == start_time else current_time
-            avg_time = statistics.mean([avg_time, current_time])
-
             file_name = result_directory + id + "_" + str(file_num) + ".json"
             __dump_file(result, file_name)
-            message = (" 문장 {} ~ {} 까지 오류가 생성되었고 json 리스트를 새로운 파일 {} 에 저장했습니다.\n 모든 문장에 오류 생성까지 : {} 초 예상됩니다".format(
-                sentence_num - json_maximum + 1, sentence_num, file_name, avg_time))
+            time_list.append(time.time()-start_time)
+            avg_time = statistics.mean(time_list)
+            left_sentence = (total_sentences - sentence_num + 1)
+            left_time = str(datetime.timedelta(seconds = round(avg_time * left_sentence / json_maximum, 2)))
+            message = (" 문장 {} ~ {} 까지 오류가 생성되었고 json 리스트를 새로운 파일 {} 에 저장했습니다.\n 모든 문장에 오류 생성까지 : {} 예상됩니다 완료까지 {} 줄 남았습니다\n ".format(
+                sentence_num - json_maximum + 1, sentence_num, file_name, left_time, left_sentence ))
             logger.info(message)
             print(message)
             result = []
+            start_time = time.time()
             last_line = sentence_num + 1
             file_num += 1
 
     if result:
         file_name = result_directory + id + "_" + str(file_num) + ".json"
         __dump_file(result, file_name)
-        message = (" 문장 {} ~ {} 까지 오류가 생성되었고 json 리스트를 새로운 파일에 저장했습니다.\n 완료까지 {} 줄 남았습니다".format(
-            last_line, len(sentences)-1, (total_sentences - sentence_num + 1)))
+        message = (" 문장 {} ~ {} 까지 오류가 생성되었고 json 리스트를 새로운 파일에 저장했습니다.".format(
+            last_line, len(sentences)-1))
         logger.info(message)
         print(message)
 
     end_time = time.time()
-    total_time = end_time - start_time
-    message = ("노이즈 생성을 완료했습니다. 소요 시간 : {} 초".format(total_time))
+    total_time = str(datetime.timedelta(seconds= round(end_time - start_time, 2)))
+    message = ("노이즈 생성을 완료했습니다. 소요 시간 : {} ".format(total_time))
     logger.info(message)
     print(message)
     print("=======================================")

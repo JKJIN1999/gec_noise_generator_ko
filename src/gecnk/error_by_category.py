@@ -13,7 +13,7 @@ class ErrorByCategory:
 
         def remove_josa(word):
             for token in word[0]:
-                if token[1][0] == "J" and len(word[0]) > 1:
+                if token[1][0] == "J" and len(token) > 1:
                     token[0] = ""
                     word[1][0] = "OM"
                     return word
@@ -90,8 +90,7 @@ class ErrorByCategory:
                     # 가장 흔한 오류인 조사 또는 접사를 띄어써서 생기는 오류
                     if token_tag[0] == "J" or token_tag == [a for a in SPACING_ADD_DIC] or prev_token_tag == "XPN":
                         word[1][0] = "S_ADD"
-                        word[0][token_num][0] = " " + \
-                            str(word[0][token_num][0])
+                        word[0][token_num][0] = "".join(" ", str(word[0][token_num][0]))
         return words
 
     def spacing_del_error(words):
@@ -105,8 +104,7 @@ class ErrorByCategory:
                 back_word_tag = words[words_count + 1][0][0][1]
                 for key, value in SPACING_DEL_DIC.items():
                     if front_word_tag == key and back_word_tag in value:
-                        text = ""
-                        words[words_count][0][-1][2] += " "
+                        words[words_count][0][-1][2] == "".join(words[words_count][0][-1][2], " ")
                         words[words_count][0].extend(words[words_count+1][0])
                         words[words_count][1][0] = "S_DEL"
                         remove_list.append(words[words_count + 1])
@@ -156,7 +154,7 @@ class ErrorByCategory:
         def middle_shiot_error(word):
             for token in word[0]:
                 result = []
-                if len(list(token[0])) >= 2 and token[1][0] == "N":
+                if token[1][0] == "N":
                     for character in token[0]:
                         if hangul_jamo.is_syllable(character):
                             jamos = list(
