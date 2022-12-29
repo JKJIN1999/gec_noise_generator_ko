@@ -11,7 +11,7 @@ https://m.blog.naver.com/PostView.naver?isHttpsRedirect=true&blogId=aramjo&logNo
 
 # 결과물
 
-![Alt text](src/gecnk/resources/example.PNG?raw=true "Title")
+![Alt text](src/gecnk/resources/examples.PNG?raw=true "Title")
 
 # Requirements
 
