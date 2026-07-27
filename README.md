@@ -1,170 +1,501 @@
-# Noise Generator for Korean Text Grammar Error Correction Model
+# Korean GEC Noise Generator
 
+> Research-driven synthetic error generation for Korean grammatical error correction (GEC).
 
-# 설명
+[![Python 3.7+](https://img.shields.io/badge/Python-3.7%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-2ea44f.svg)](https://github.com/JKJIN1999/gec_noise_generator_ko/blob/master/LICENSE)
 
-### 이 모델은 한글 맞춤법 검사기의 학습 데이터 증강을 목적으로 한국인이 자주 틀리는 오류 리서치에 기반해 생성한 노이즈 생성기입니다.
-### 오류를 생성할 데이터는 올바른 맞춤법을 갖춘 한글 문장을 한 줄 단위로 나누어 저장한 txt 파일 형식이어야 됩니다. 
-예시 링크 https://drive.google.com/drive/folders/1eBqzHWf7fzjjOjDxApSO6rrV2hdBLSWQ?usp=sharing<br />
-### 오류의 생성 방법에는 국립 국어원의 오류주석 양상을 기준으로 한 방법과 오류 유형을 기준으로 하는 두가지 방법이 있습니다.
-### 형태소 분석기 Mecab을 활용하고 있습니다.
-품사 태그는 아래의 사이트를 방문해 확인하시길 바랍니다.<br />
-https://m.blog.naver.com/PostView.naver?isHttpsRedirect=true&blogId=aramjo&logNo=221404488280 <br />
+[English](#english) · [한국어](#한국어)
 
-# 결과물
-https://drive.google.com/drive/folders/163qe9Hec8gkgAE0ZzJmy-ryYLUpqcj-Y?usp=sharing
-위의 링크확인
-![Alt text](src/gecnk/resources/examples.PNG?raw=true "Title")
+![Example output from the Korean GEC Noise Generator](https://github.com/JKJIN1999/gec_noise_generator_ko/blob/master/src/gecnk/resources/examples.PNG?raw=true)
 
+---
 
+## English
 
-# Requirements
+### Overview
 
-## Python >= 3.7 
+Korean GEC Noise Generator creates synthetic spelling and grammar errors from
+clean Korean sentences. It is designed to augment training data for Korean
+grammatical error correction models with mistakes inspired by commonly observed
+native-speaker errors.
 
-```consol
-pip install wget
-pip install hangul_jamo
-pip install g2pk
-pip install gensim
-pip install python-mecab-ko
-pip install fasttext
-```
- 현재 윈도우 os에서 python-mecab-ko가 실행되지 않는 오류가 있습니다.<br />
- 리눅스나 구글 코랩 macos에서만 사용 가능합니다.<br />
+The generator supports two complementary ways to control noise:
 
-# 사용 방법
-## 준비 자료
-### 1. 프로그램을 클론
-```consol
-git clone https://github.com/JKJIN1999/gec_noise_generator_ko.git
-```
-### 2. Requirements 설치
+- **Error aspect** — generate errors using annotation-oriented labels such as
+  omission, malformed form, replacement, and addition.
+- **Error category** — generate errors using linguistic mechanisms such as
+  particle, affix, consonant, vowel, or spacing errors.
+
+The project uses **MeCab** for Korean morphological analysis and writes the
+generated source–target pairs and error annotations to JSON.
+
+### Highlights
+
+- Generates realistic synthetic errors from clean Korean text
+- Supports both annotation aspects and linguistic error categories
+- Records up to four selected error annotations per sentence
+- Preserves the original sentence as the correction target
+- Records error labels, word positions, and character offsets
+- Splits large outputs across multiple JSON files
+
+### Requirements
+
+- Python 3.7 or later
+- Linux, macOS, or Google Colab recommended
+- MeCab through `python-mecab-ko`
+
+> [!NOTE]
+> The project has known compatibility issues with `python-mecab-ko` on native
+> Windows. Use WSL, Linux, macOS, or Google Colab if installation fails.
+
+### Installation
+
 ```bash
+git clone https://github.com/JKJIN1999/gec_noise_generator_ko.git
+cd gec_noise_generator_ko
+
+python3 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
 pip install -r requirements.txt
 ```
-### 3. Noise를 생성할 올바른 맞춤법을 갖춘 문장 데이터
-예시 데이터 https://drive.google.com/drive/folders/1eBqzHWf7fzjjOjDxApSO6rrV2hdBLSWQ?usp=sharing<br />
-### 4. Terminal에서 main.py 실행
-GEC noise generator ko 에는 7가지 인자를 받습니다.
 
-터미널 또는 bash에서 아래 코드에 원하는 인자를 입력하여 사용할 수 있습니다.<br />
-```consol
-python3 gec_noise_generator_ko/src/gecnk/main.py 
+The main dependencies are `python-mecab-ko`, `g2pK`, `hangul-jamo`, `gensim`,
+`fasttext`, and `wget`.
+
+### Input format
+
+Provide a UTF-8 text file containing **one correctly written Korean sentence per
+line**:
+
+```text
+국내에서 유일하게 법정 커버드본드를 발행할 수 있는 주택금융공사는 지난해 7월 아시아 최초로 5억 달러 규모의 커버드본드를 발행했다
+롯데 선발 송승준은 한화 타선을 5회까지 1실점으로 봉쇄하고 시즌 13승째를 챙겼다
+3개월 후 최고 국방회의에서 충칭 천도를 통보했다
 ```
-뒤에 인자를 입력하시면 됩니다. 예시는 아래와 같이<br />
-```consol
-python3 gec_noise_generator_ko/src/gecnk/main.py -e OM REP MIF -r ./src/results -d NWRW
+
+[Download sample input data](https://drive.google.com/drive/folders/1eBqzHWf7fzjjOjDxApSO6rrV2hdBLSWQ?usp=sharing)
+
+### Quick start
+
+Create an output directory, then run the generator from the repository root:
+
+```bash
+mkdir -p results
+
+python3 src/gecnk/main.py \
+  -d ./data/corpus.txt \
+  -b aspect \
+  -e OM REP MIF \
+  -r ./results/
 ```
-## Arguments 인자<br />
-* -h, help            
-> README.md 에 자세한 설명이 적혀져있습니다.<br />
-* -d data_directory     
-> 오류를 생성할 데이터 경로를 입력하시오<br />
-* -e error_list [error_list ...]<br />
-> 생성할 오류 리스트를 입력하시오<br />
-* -r result_directory   
-> 파일을 저장할 경로를 입력하시오<br />
-> 기본 저장 경로는 src/gecnk/results/ 입니다<br />
-* -m json_maximum      
-> 한 파일에 저장할 최대 json 리시트 갯수를 입력하시오<br />
-> 기본 100000개의 json 리스트로 설정되어있습니다<br />
-* -t tokenizer_type    
-> 원하는 토크나이저의 유형을 -t 뒤에 입력하십시오<br />
-> 기본 토크나이저는 mecab으로 설정되어있습니다<br />
-> black은 wisekmapy를 보유하시고 gec_noise_generator_ko 파일 안에 위치한다면 사용이 가능하지만<br /> 
-> mecab을 토대로 개발되었기 때문에 결합과정에서 오류가 존재함으로 mecab을 권장드립니다. <br />
-* -b error_by      
-> 오류 생성 기준을 오류 양상으로 할것인지 오류 유형으로 할것인지 입력하시오<br />
-> aspect는 오류 양상을 기준으로 오류 생성 (JS, BS, AF, G2P, S_ADD, S_DEL, CO, VO)<br />
-> category는 오류 유형을 기준으로 오류 생성 (OM REP MIF ADD S_ADD S_DEL)<br />
-> 만약 aspect를 고르셨다면 -l label_type은 설정하지 않아도 괜찮습니다 (JS, BS, AF, G2P, S_ADD, S_DEL, CO, VO)<br />
-> 기본 error_by는 category로 설정되어있습니다<br />
-* -l label_type        
-> 원하는 Label 타입을 입력하시오 <br />
-> 기본 Label 타입은 benchmark로 설정되어있습니다<br />
-> original로 설정하시면 결과 라벨을 오류 유형으로 나타냅니다 (JS, BS, AF, G2P, S_ADD, S_DEL, CO, VO)<br />
-> benchmark로 설정하시면 결과 라벨을 국립 국어원 오류 양상으로 나타냅니다 (OM REP MIF ADD S_ADD S_DEL) <br />
 
-결과물인 Json 파일은 기본적으로 result 폴더안에 저장되어있습니다. 
+> [!IMPORTANT]
+> The output directory must already exist. Include a trailing `/` in the value
+> passed to `-r`.
 
-gec_noise_generator_ko 를 사용하기 위해서는 텍스트 파일과 그 경로가 필요합니다.<br />
-텍스트 데이터는 줄단위로 문장이 나누어진 형태여야만 합니다.<br />
+Run the built-in example with the default options:
 
-# 오류 유형별 오류 생성 방법 (Error Category) 
-### 정확한 분류 기준은 아래의 링크를 참조
-### https://fuchsia-trouser-5c6.notion.site/dcc5d8bc23dc493c91ece7bd23dfb655
+```bash
+python3 src/gecnk/main.py
+```
 
-* JS [josa Error]
-> 품사가 조사인 어절을 삭제한다<br />
-> 조사 변경 기준표에 따라 조사를 변경한다. 아래의 링크를 참조<br />
+Show CLI help:
 
-* BS [busa error]
-> 부사 ["이", "히"] 로 변경한다<br />
-> 부사 ["마저", "마져"] 로 변경한다<br />
+```bash
+python3 src/gecnk/main.py --help
+```
 
-* CO [consonant error]
-> 어절을 음절로, 음절을 음소로 나누어 자음을 변경한다<br />
-> 사이시옷 오류<br />
-> 같은 음절의 된소리가 반복될 경우 뒤의 음절 초성을 예사소리로 변경<br />
-> "으려"를 "을려"로 변경 또한 "려고"앞 음절에 "ㄹ"종성 추가<br />
-> 소리 나는대로 종성을 변경<br />
-> ["않", "안]" 또는 ["많", "만"] 으로 종성 변경<br />
-> 종성 "ㅎ" 탈락<br />
+### CLI reference
 
-* VO [vowel error]
-> 단모음 ["ㅔ", "ㅐ"] 교체<br />
-> 이중모음 ["ㅖ", "ㅔ"], ["ㅢ", "ㅣ"], ["ㅙ", "ㅚ"] 변경<br />
+| Option | Description | Default |
+| --- | --- | --- |
+| `-h`, `--help` | Show the command-line help message | — |
+| `-d DATA_PATH` | UTF-8 text file containing one clean sentence per line | `./src/gecnk/resources/test-tgt` |
+| `-e ERROR [ERROR ...]` | One or more error labels to generate | `OM` |
+| `-r OUTPUT_DIR` | Directory in which JSON files are written | `./src/results/` |
+| `-m MAX_ITEMS` | Maximum number of sentence records per JSON file | `100000` |
+| `-t TOKENIZER` | Tokenizer to use: `mecab` or `black` | `mecab` |
+| `-b MODE` | Error-generation mode: `aspect` or `category` | `aspect` |
+| `-l LABEL_TYPE` | Output label scheme for category mode: `benchmark` or `original` | `benchmark` |
 
-* S_ADD [spacing add error]
-> 앞 형태소가 접사이고 <br />
-> 뒤의 형태소가 조사거나 (명사,동사,형용사)파생 접미사인 경우 띄어쓰기를 생성 <br />
+Use `ALL` to combine every label available in the selected mode, or
+`random_two` to sample two labels:
 
+```bash
+# Apply all error aspects
+python3 src/gecnk/main.py -d ./data/corpus.txt -b aspect -e ALL -r ./results/
 
-* S_DEL [spacing delete error]
-> 특정 기준에 따라 constant 파일에 있는 SPACING_DEL_DIC을 활용<br />
-> 앞의 형태소가 key이고 뒤의 형태소가 value안에 있는경우 두 어절을 붙여쓴다<br />
+# Randomly select two linguistic error categories
+python3 src/gecnk/main.py -d ./data/corpus.txt -b category -e random_two -r ./results/
+```
 
-* ALL
-> 모든 오류유형을 결합하여 오류를 생성<br />
+### Error-generation modes
 
-* random_two
-> 랜덤하게 두가지 오류를 골라서 오류를 생성<br />
+#### 1. Error aspect (`-b aspect`)
 
-# 오류 양상별 오류 생성 방법 (Error Aspect) 
+This mode follows annotation-oriented error labels.
 
-* OM [누락]
-> 완전한 문장/발화에서 나타나야 할 형태가 빠져있는 경우<br />
-> Josa: [조사 전체 삭제, 조사 일부분 삭제]<br />
-> Consonant: [사이시옷 삭제, 종성 “ㅎ” 삭제]<br />
+| Label | Name | Description |
+| --- | --- | --- |
+| `OM` | Omission | Removes a form that should appear in a complete sentence, such as a particle or final consonant |
+| `MIF` | Malformed form | Produces a non-standard inflection, spelling, particle, affix, consonant, or vowel form |
+| `REP` | Replacement | Replaces a valid form with another lexical or grammatical form |
+| `ADD` | Addition | Inserts or duplicates a form that should not appear |
+| `S_ADD` | Spacing addition | Inserts an incorrect space inside an eojeol |
+| `S_DEL` | Spacing deletion | Incorrectly joins adjacent eojeols |
 
-* MIF [오형태]
-> 한국어에 존재하지 않는 어휘를 만들어 내거나 조사와 어미의 활용 형태가 잘못된 경우 즉, 활용 또는 곡용을 잘못하여 다른 이형태를 사용한 경우 또는 철자를 잘못 사용한 경우<br />
-> Consonant: [두음법칙, 겹처나는 된소리 예사소리로 교체, 종성을 같은 소리인 다른 종성으로 교체, 종성 “ㄶ“과”ㄴ”의 교체, ] <br />
-> Vowel: [단모음 “ㅔ” 와 “ㅐ 교체,  이중모음 “ㅖ” 와 “ㅔ” 또는 “ㅙ” 와 “ㅚ” 교체]<br />
-> Josa: [같은 길이의 조사 (이>가, 에>께, 에>의, 처럼>마냥)을 제외한 모든 조사 변경]<br />
-> Affix: [”율” 와 “률” 교체 또는 ”양” 와 “량” 교체]<br />
-> Busa: [ “이” 와 “히” 교체, ”마져” 와 “마저” 교체]<br />
-> Grapheme_to_Phonem: [g2pk 룰북 기준에 의해 소리 나는 대로 변경]<br />
+Example:
 
-* REP [대치]
-> 다른 의미의 어휘를 사용하거나 적절한 품사를 사용하지 못한 경우 또는 한국어에 없는 표현이나 한국어가 아닌 다른 언어를 사용한 경우<br />
-> Josa: [같은 길이의 조사 이>가, 에>께, 에>의, 처럼>마냥 교체]<br />
-> Vowel: [이중모음 “의” 와 단모음 “이” 교체]<br />
+```bash
+python3 src/gecnk/main.py \
+  -d ./data/corpus.txt \
+  -b aspect \
+  -e OM MIF S_DEL \
+  -r ./results/
+```
 
-* ADD [첨가]
-> 완전한 문장/발화에서 나타나지 말아야 할 형태가 쓰인 경우나 중복된 형태를 반복해서 사용한 경우<br />
-> Josa: [조사를 길게 변경]<br />
-> Consonant: [종성에 “ㄹ” 추가]<br />
+#### 2. Error category (`-b category`)
 
-* S_DEL [spacing delete error]
-> 특정 기준에 따라 constant 파일에 있는 SPACING_DEL_DIC을 활용<br />
-> 앞의 형태소가 key이고 뒤의 형태소가 value안에 있는경우 두 어절을 붙여쓴다<br />
+This mode selects the linguistic mechanism used to generate an error.
 
-* S_ADD [spacing add error]
-> 앞 형태소가 접사이고 <br />
-> 뒤의 형태소가 조사거나 (명사,동사,형용사)파생 접미사인 경우 띄어쓰기를 생성 <br />
+| Label | Category | Typical transformation |
+| --- | --- | --- |
+| `JS` | Particle (조사) | Delete or replace a Korean particle |
+| `BS` | Adverb (부사) | Confuse forms such as `이/히` or `마저/마져` |
+| `AF` | Affix (접사) | Confuse affix forms such as `율/률` or `양/량` |
+| `G2P` | Grapheme-to-phoneme | Rewrite a form according to its pronunciation |
+| `CO` | Consonant | Modify an onset or final consonant, including tensification-related patterns |
+| `VO` | Vowel | Confuse commonly mixed vowels such as `ㅔ/ㅐ`, `ㅖ/ㅔ`, or `ㅙ/ㅚ` |
+| `S_ADD` | Spacing addition | Insert an incorrect space |
+| `S_DEL` | Spacing deletion | Remove a required space |
 
-# 토크나이저 Black 활용
-Black 또한 사용 가능하지만 추가적인 작업이 필요합니다.<br />
-Black을 사용하고 싶으신 경우 wisekmapy를 gec_noise_generator_ko 파일 안에 넣어주시면 사용이 가능합니다.<br />
+Example:
+
+```bash
+python3 src/gecnk/main.py \
+  -d ./data/corpus.txt \
+  -b category \
+  -e JS CO VO \
+  -l benchmark \
+  -r ./results/
+```
+
+When category mode is selected, `-l` controls the intended output label scheme:
+
+- `benchmark` — annotation-aspect labels (`OM`, `MIF`, `REP`, `ADD`, `S_ADD`,
+  `S_DEL`)
+- `original` — generator-category labels (`JS`, `BS`, `AF`, `G2P`, `CO`, `VO`,
+  `S_ADD`, `S_DEL`)
+
+For a more detailed taxonomy, see the
+[error classification notes](https://fuchsia-trouser-5c6.notion.site/dcc5d8bc23dc493c91ece7bd23dfb655).
+
+### Output
+
+The generator writes one or more UTF-8 JSON files to the selected output
+directory. Each sentence record contains:
+
+- `id` — sentence identifier
+- `source` — sentence with synthetic errors
+- `target` — original clean sentence
+- `word` — word-level text and character offsets
+- `GEC` — generated error spans, corrections, and labels
+
+Illustrative structure:
+
+```json
+[
+  {
+    "id": "corpus.txt.0",
+    "source": "노이즈가 적용된 문장",
+    "target": "올바른 원문 문장",
+    "word": [
+      {
+        "id": 0,
+        "source": "노이즈가",
+        "begin": 0,
+        "end": 4
+      }
+    ],
+    "GEC": [
+      {
+        "id": 0,
+        "source": "오류 표현",
+        "target": "정답 표현",
+        "label": "MIF",
+        "begin": 0,
+        "end": 4
+      }
+    ]
+  }
+]
+```
+
+[View generated sample data](https://drive.google.com/drive/folders/163qe9Hec8gkgAE0ZzJmy-ryYLUpqcj-Y?usp=sharing)
+
+### Tokenizers
+
+`mecab` is the default and recommended tokenizer. For MeCab part-of-speech
+tags, see this
+[Korean MeCab POS tag reference](https://m.blog.naver.com/PostView.naver?isHttpsRedirect=true&blogId=aramjo&logNo=221404488280).
+
+The `black` tokenizer option requires a separately obtained `wisekmapy` package
+inside the repository. Because the generator was developed around MeCab,
+tokenization or token-joining issues may occur with `black`.
+
+### License
+
+This project is released under the
+[MIT License](https://github.com/JKJIN1999/gec_noise_generator_ko/blob/master/LICENSE).
+
+Questions and bug reports are welcome in
+[GitHub Issues](https://github.com/JKJIN1999/gec_noise_generator_ko/issues).
+
+---
+
+## 한국어
+
+### 소개
+
+Korean GEC Noise Generator는 올바른 한국어 문장에 인공적인 맞춤법·문법
+오류를 생성하는 도구입니다. 한국인이 자주 범하는 오류를 바탕으로 한국어 문법
+오류 교정(Grammatical Error Correction, GEC) 모델의 학습 데이터를 증강하도록
+설계했습니다.
+
+노이즈 생성 기준은 두 가지입니다.
+
+- **오류 양상(Error aspect)** — 누락, 오형태, 대치, 첨가 등 주석 체계
+  중심으로 오류를 생성합니다.
+- **오류 유형(Error category)** — 조사, 접사, 자음, 모음, 띄어쓰기 등
+  언어학적 변환 방식 중심으로 오류를 생성합니다.
+
+한국어 형태소 분석에는 **MeCab**을 사용하며, 생성한 오류 문장과 원문 및 오류
+주석은 JSON 파일로 저장합니다.
+
+### 주요 기능
+
+- 올바른 한국어 문장에서 자연스러운 합성 오류 생성
+- 오류 양상과 언어학적 오류 유형의 두 가지 생성 기준 지원
+- 문장당 최대 4개의 선택된 오류 주석 기록
+- 올바른 원문을 교정 정답으로 보존
+- 오류 라벨, 어절 위치, 문자 단위 오프셋 기록
+- 대용량 결과를 여러 JSON 파일로 분할 저장
+
+### 실행 환경
+
+- Python 3.7 이상
+- Linux, macOS 또는 Google Colab 권장
+- `python-mecab-ko`를 통한 MeCab 사용
+
+> [!NOTE]
+> 네이티브 Windows 환경에서는 `python-mecab-ko` 호환성 문제가 발생할 수
+> 있습니다. 설치에 실패하면 WSL, Linux, macOS 또는 Google Colab을 사용하세요.
+
+### 설치
+
+```bash
+git clone https://github.com/JKJIN1999/gec_noise_generator_ko.git
+cd gec_noise_generator_ko
+
+python3 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+주요 의존성은 `python-mecab-ko`, `g2pK`, `hangul-jamo`, `gensim`,
+`fasttext`, `wget`입니다.
+
+### 입력 데이터 형식
+
+UTF-8로 인코딩된 텍스트 파일에 **올바른 한국어 문장을 한 줄에 하나씩**
+저장합니다.
+
+```text
+국내에서 유일하게 법정 커버드본드를 발행할 수 있는 주택금융공사는 지난해 7월 아시아 최초로 5억 달러 규모의 커버드본드를 발행했다
+롯데 선발 송승준은 한화 타선을 5회까지 1실점으로 봉쇄하고 시즌 13승째를 챙겼다
+3개월 후 최고 국방회의에서 충칭 천도를 통보했다
+```
+
+[입력 예시 데이터 내려받기](https://drive.google.com/drive/folders/1eBqzHWf7fzjjOjDxApSO6rrV2hdBLSWQ?usp=sharing)
+
+### 빠른 시작
+
+출력 폴더를 만든 뒤 저장소 루트에서 아래 명령을 실행합니다.
+
+```bash
+mkdir -p results
+
+python3 src/gecnk/main.py \
+  -d ./data/corpus.txt \
+  -b aspect \
+  -e OM REP MIF \
+  -r ./results/
+```
+
+> [!IMPORTANT]
+> 출력 폴더는 실행 전에 만들어 두어야 합니다. `-r`에 입력하는 경로 끝에는
+> `/`를 포함하세요.
+
+기본 옵션과 내장 예시 데이터로 실행하려면 다음 명령을 사용합니다.
+
+```bash
+python3 src/gecnk/main.py
+```
+
+CLI 도움말은 다음과 같이 확인할 수 있습니다.
+
+```bash
+python3 src/gecnk/main.py --help
+```
+
+### CLI 인자
+
+| 옵션 | 설명 | 기본값 |
+| --- | --- | --- |
+| `-h`, `--help` | 명령행 도움말 출력 | — |
+| `-d DATA_PATH` | 한 줄에 하나의 올바른 문장이 들어 있는 UTF-8 텍스트 파일 | `./src/gecnk/resources/test-tgt` |
+| `-e ERROR [ERROR ...]` | 생성할 오류 라벨 하나 이상 | `OM` |
+| `-r OUTPUT_DIR` | JSON 결과를 저장할 폴더 | `./src/results/` |
+| `-m MAX_ITEMS` | JSON 파일 하나에 저장할 최대 문장 레코드 수 | `100000` |
+| `-t TOKENIZER` | 사용할 토크나이저: `mecab` 또는 `black` | `mecab` |
+| `-b MODE` | 오류 생성 기준: `aspect` 또는 `category` | `aspect` |
+| `-l LABEL_TYPE` | category 모드의 출력 라벨 체계: `benchmark` 또는 `original` | `benchmark` |
+
+선택한 모드의 모든 라벨을 조합하려면 `ALL`, 임의의 라벨 두 개를 선택하려면
+`random_two`를 사용합니다.
+
+```bash
+# 모든 오류 양상 적용
+python3 src/gecnk/main.py -d ./data/corpus.txt -b aspect -e ALL -r ./results/
+
+# 언어학적 오류 유형 중 두 개를 무작위로 선택
+python3 src/gecnk/main.py -d ./data/corpus.txt -b category -e random_two -r ./results/
+```
+
+### 오류 생성 모드
+
+#### 1. 오류 양상 (`-b aspect`)
+
+주석 체계 중심의 오류 라벨을 사용합니다.
+
+| 라벨 | 이름 | 설명 |
+| --- | --- | --- |
+| `OM` | 누락 | 완전한 문장에 필요한 조사나 종성 등의 형태를 삭제 |
+| `MIF` | 오형태 | 잘못된 활용, 철자, 조사, 접사, 자음 또는 모음 형태 생성 |
+| `REP` | 대치 | 올바른 형태를 다른 어휘·문법 형태로 교체 |
+| `ADD` | 첨가 | 불필요한 형태를 삽입하거나 중복 |
+| `S_ADD` | 띄어쓰기 첨가 | 어절 내부에 잘못된 공백 삽입 |
+| `S_DEL` | 띄어쓰기 삭제 | 서로 다른 어절 사이의 필요한 공백 삭제 |
+
+사용 예시:
+
+```bash
+python3 src/gecnk/main.py \
+  -d ./data/corpus.txt \
+  -b aspect \
+  -e OM MIF S_DEL \
+  -r ./results/
+```
+
+#### 2. 오류 유형 (`-b category`)
+
+오류를 만드는 언어학적 변환 방식을 선택합니다.
+
+| 라벨 | 유형 | 대표적인 변환 |
+| --- | --- | --- |
+| `JS` | 조사 | 조사 삭제 또는 다른 조사로 교체 |
+| `BS` | 부사 | `이/히`, `마저/마져` 등의 형태 혼동 |
+| `AF` | 접사 | `율/률`, `양/량` 등의 형태 혼동 |
+| `G2P` | 발음 기반 | 발음 나는 형태로 표기 변경 |
+| `CO` | 자음 | 초성·종성 변환 및 된소리 관련 오류 생성 |
+| `VO` | 모음 | `ㅔ/ㅐ`, `ㅖ/ㅔ`, `ㅙ/ㅚ` 등 혼동 |
+| `S_ADD` | 띄어쓰기 첨가 | 잘못된 공백 삽입 |
+| `S_DEL` | 띄어쓰기 삭제 | 필요한 공백 삭제 |
+
+사용 예시:
+
+```bash
+python3 src/gecnk/main.py \
+  -d ./data/corpus.txt \
+  -b category \
+  -e JS CO VO \
+  -l benchmark \
+  -r ./results/
+```
+
+category 모드에서는 `-l`로 의도한 출력 라벨 체계를 선택할 수 있습니다.
+
+- `benchmark` — 오류 양상 라벨(`OM`, `MIF`, `REP`, `ADD`, `S_ADD`,
+  `S_DEL`)
+- `original` — 생성기 오류 유형 라벨(`JS`, `BS`, `AF`, `G2P`, `CO`, `VO`,
+  `S_ADD`, `S_DEL`)
+
+세부 분류 기준은
+[오류 분류 노트](https://fuchsia-trouser-5c6.notion.site/dcc5d8bc23dc493c91ece7bd23dfb655)를
+참고하세요.
+
+### 출력
+
+생성기는 지정한 폴더에 UTF-8 JSON 파일을 하나 이상 저장합니다. 각 문장
+레코드에는 다음 정보가 포함됩니다.
+
+- `id` — 문장 식별자
+- `source` — 합성 오류가 적용된 문장
+- `target` — 올바른 원문
+- `word` — 어절별 텍스트와 문자 위치
+- `GEC` — 오류 범위, 교정 표현, 라벨
+
+구조 예시:
+
+```json
+[
+  {
+    "id": "corpus.txt.0",
+    "source": "노이즈가 적용된 문장",
+    "target": "올바른 원문 문장",
+    "word": [
+      {
+        "id": 0,
+        "source": "노이즈가",
+        "begin": 0,
+        "end": 4
+      }
+    ],
+    "GEC": [
+      {
+        "id": 0,
+        "source": "오류 표현",
+        "target": "정답 표현",
+        "label": "MIF",
+        "begin": 0,
+        "end": 4
+      }
+    ]
+  }
+]
+```
+
+[생성 결과 예시 보기](https://drive.google.com/drive/folders/163qe9Hec8gkgAE0ZzJmy-ryYLUpqcj-Y?usp=sharing)
+
+### 토크나이저
+
+기본값이자 권장 토크나이저는 `mecab`입니다. 품사 태그는
+[한국어 MeCab 품사 태그 참고 자료](https://m.blog.naver.com/PostView.naver?isHttpsRedirect=true&blogId=aramjo&logNo=221404488280)에서
+확인할 수 있습니다.
+
+`black` 옵션을 사용하려면 별도로 확보한 `wisekmapy` 패키지를 저장소 내부에
+배치해야 합니다. 이 프로젝트는 MeCab을 기준으로 개발되었으므로 `black`에서는
+토큰화 또는 결합 과정에 문제가 발생할 수 있습니다.
+
+### 라이선스
+
+이 프로젝트는
+[MIT License](https://github.com/JKJIN1999/gec_noise_generator_ko/blob/master/LICENSE)로
+배포됩니다.
+
+질문과 버그 제보는
+[GitHub Issues](https://github.com/JKJIN1999/gec_noise_generator_ko/issues)에
+남겨 주세요.
